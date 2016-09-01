@@ -1,0 +1,1 @@
+20 1	* * *	apt-mirror	mountpoint -q /mnt/USB_HDD && /usr/bin/apt-mirror /etc/apt/mirror.list.raspbian

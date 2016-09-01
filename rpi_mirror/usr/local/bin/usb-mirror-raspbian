@@ -1,0 +1,7 @@
+#!/bin/bash
+
+# exit if HDD or KEY not mounted
+mountpoint -q /mnt/USB_HDD && mountpoint -q /mnt/USB_KEY || { echo "USB hdd or key not mounted"; exit 1; }
+# for sync ext4 fs with vfat (see http://www.monperrus.net/martin/backup+from+ext3+to+vfat+with+rsync)
+RSYNC_OPT="-a --no-o --no-p --no-g --safe-links --modify-window 1 --delete-delay --delay-updates --stats"
+rsync $RSYNC_OPT /mnt/USB_HDD/raspbian/ /mnt/USB_KEY/raspbian
