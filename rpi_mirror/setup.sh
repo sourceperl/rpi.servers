@@ -59,7 +59,8 @@ service cron reload
 
 # configure apache2
 rm -f /var/www/html/index.html
-ln -fs /mnt/USB_HDD/raspbian/ /var/www/html/raspbian
+ln -fs /mnt/USB_HDD/raspbian/mirror/archive.raspberrypi.org/ archive.raspberrypi.org
+ln -fs /mnt/USB_HDD/raspbian/mirror/mirrordirector.raspbian.org/  mirrordirector.raspbian.org
 
 # change the hostname
 CURRENT_HOSTNAME=$(cat /proc/sys/kernel/hostname)
