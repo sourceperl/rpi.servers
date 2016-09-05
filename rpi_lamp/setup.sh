@@ -16,6 +16,9 @@ NAME=$(basename $0)
 # exit on error
 set -e
 
+# current dir is script dir
+cd "$(dirname "$0")"
+
 # global env
 export DEBIAN_FRONTEND=noninteractive
 

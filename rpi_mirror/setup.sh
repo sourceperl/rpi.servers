@@ -14,6 +14,9 @@ NAME=$(basename $0)
 # check root
 [ $EUID -ne 0 ] && { printf "ERROR: $NAME needs to be run by root\n" 1>&2; exit 1; }
 
+# current dir is script dir
+cd "$(dirname "$0")"
+
 # check UUIDs
 [ ! -b /dev/disk/by-uuid/$UUID_HDD ] && { printf "ERROR: UUID_HDD not exist\n" 1>&2; exit 1; }
 [ ! -b /dev/disk/by-uuid/$UUID_KEY ] && { printf "ERROR: UUID_KEY not exist\n" 1>&2; exit 1; }
