@@ -15,8 +15,8 @@ NAME=$(basename $0)
 # check root
 [ $EUID -ne 0 ] && { printf "ERROR: $NAME needs to be run by root\n" 1>&2; exit 1; }
 
-# exit on error
-set -e
+# current dir is script dir
+cd "$(dirname "$0")"
 
 # generate file(s) not readable only by root.
 umask 022
@@ -28,15 +28,18 @@ apt-get install -y isc-dhcp-server
 # set static IP address
 L1="interface eth0"
 L2="static ip_address=$IP_SUBNET"
-#L3="static routers=$IP_GATEWAY"
+[[ $IP_GATEWAY ]] && L3="static routers=$IP_GATEWAY"
 FILE=/etc/dhcpcd.conf
-grep -q "$L1" "$FILE" && { printf "static config already exist, exit\n" 1>&2; exit 1; } 
-echo "" >> "$FILE"
-echo "# static configuration" >> "$FILE"
-echo "$L1" >> "$FILE"
-echo "$L2" >> "$FILE"
-#echo "$L3" >> "$FILE"
-service dhcpcd restart
+if grep -q "$L1" "$FILE"
+then
+    printf "static config already exist, skip config\n" 1>&2
+else
+    echo "" >> "$FILE"
+    echo "# static configuration" >> "$FILE"
+    echo "$L1" >> "$FILE"
+    echo "$L2" >> "$FILE"
+    [[ $L3 ]] && echo "$L3" >> "$FILE"
+fi
 
 # update isc-dhcp-server conf
 cp etc/dhcp/dhcpd.conf /etc/dhcp/dhcpd.conf
@@ -49,9 +52,6 @@ if [ -n "$INTERFACES" ]; then
     rm ${TMPFILE}
 fi
 
-# restart DHCP servers
-service isc-dhcp-server restart
-
 # change the hostname
 CURRENT_HOSTNAME=$(cat /proc/sys/kernel/hostname)
 echo "$NEW_HOSTNAME" > /etc/hostname
@@ -59,6 +59,6 @@ sed -i "s/127.0.1.1.*$CURRENT_HOSTNAME/127.0.1.1\t$NEW_HOSTNAME/g" /etc/hosts
 
 # end messages
 echo "setup finish, take care to:"
-echo "-> make a reboot to update hostname"
+echo "-> make a reboot to update hostname, restart network and DHCP server"
 echo "-> check network conf"
 
