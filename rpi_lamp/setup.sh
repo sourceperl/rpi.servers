@@ -33,6 +33,7 @@ debconf-set-selections <<<  "phpmyadmin phpmyadmin/mysql/admin-pass password $MY
 #debconf-set-selections <<<  "phpmyadmin phpmyadmin/app-password-confirm password your-app-pwd"
 
 # install packages
+apt-get update && apt-get -y upgrade
 apt-get install -y apache2 php5 mysql-server php5-mysql phpmyadmin
 
 # secure mysql
