@@ -36,6 +36,8 @@ mv /srv/flyspray/htaccess.dist /srv/flyspray/.htaccess
 sed -i "s/#\s*RewriteBase/RewriteBase/g" /srv/flyspray/.htaccess
 # www-data own all files
 chown -R www-data:www-data /srv/flyspray
+# for file upload works
+chmod u+x /srv/flyspray/attachments/
 
 # add password to flyspray web app
 sed -i "s/<FLY_PWD>/$FLY_PWD/g" /srv/flyspray/flyspray.conf.php
