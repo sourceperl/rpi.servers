@@ -9,6 +9,7 @@ MYSQL_PWD="mysql"
 
 # vars
 NAME=$(basename $0)
+DEBIAN=$(sed 's/\..*//' /etc/debian_version)
 
 # check root
 [ $EUID -ne 0 ] && { printf "ERROR: $NAME needs to be run by root\n" 1>&2; exit 1; }
@@ -35,15 +36,18 @@ debconf-set-selections <<<  "phpmyadmin phpmyadmin/mysql/admin-pass password $MY
 #debconf-set-selections <<<  "phpmyadmin phpmyadmin/mysql/app-pass password your-app-db-pwd"
 #debconf-set-selections <<<  "phpmyadmin phpmyadmin/app-password-confirm password your-app-pwd"
 
-# install packages
+# install packages (for debian jessie or stretch)
 apt-get update && apt-get -y upgrade
-apt-get install -y apache2 php5 mysql-server php5-mysql phpmyadmin
+[ $DEBIAN -eq 8 ] && { apt-get install -y apache2 php5 mysql-server php5-mysql phpmyadmin; }
+[ $DEBIAN -eq 9 ] && { apt-get install -y apache2 php7.0 mysql-server php7.0-mysql phpmyadmin; }
 
 # secure mysql
 mysql --defaults-file=/etc/mysql/debian.cnf <<< "DELETE FROM mysql.user WHERE User='';"
 mysql --defaults-file=/etc/mysql/debian.cnf <<< "DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');"
 mysql --defaults-file=/etc/mysql/debian.cnf <<< "DROP DATABASE IF EXISTS test;"
 mysql --defaults-file=/etc/mysql/debian.cnf <<< "DELETE FROM mysql.db WHERE Db='test' OR Db='test\\_%';"
+# remove unix_socket to allow phpmyadmin root login (for debian stretch)
+[ $DEBIAN -eq 9 ] && { mysql --defaults-file=/etc/mysql/debian.cnf mysql <<< "UPDATE user SET plugin='' WHERE user='root';"; }
 mysql --defaults-file=/etc/mysql/debian.cnf <<< "FLUSH PRIVILEGES;"
 
 # change the hostname
@@ -55,4 +59,3 @@ sed -i "s/127.0.1.1.*$CURRENT_HOSTNAME/127.0.1.1\t$NEW_HOSTNAME/g" /etc/hosts
 echo "setup finish, take care to:"
 echo "-> make a reboot to update hostname"
 echo "-> add a network conf if don't use standard eth0 with DHCP"
-
