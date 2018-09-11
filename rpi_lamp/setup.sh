@@ -50,9 +50,6 @@ mysql --defaults-file=/etc/mysql/debian.cnf <<< "DELETE FROM mysql.db WHERE Db='
 # create admin user for phpmyadmin
 mysql --defaults-file=/etc/mysql/debian.cnf <<< "CREATE USER 'admin'@'localhost' IDENTIFIED BY '$MYSQL_PWD';"
 mysql --defaults-file=/etc/mysql/debian.cnf <<< "GRANT ALL PRIVILEGES ON *.* TO 'admin'@'localhost' WITH GRANT OPTION;"
-# remove unix_socket to allow phpmyadmin root login (for debian stretch)
-#[ $DEBIAN -eq 9 ] && { mysql --defaults-file=/etc/mysql/debian.cnf mysql <<< "UPDATE user SET plugin='' WHERE user='root';"; }
-#[ $DEBIAN -eq 9 ] && { mysql --defaults-file=/etc/mysql/debian.cnf mysql <<< "UPDATE user SET password=PASSWORD('$MYSQL_PWD') where user='root';"; }
 mysql --defaults-file=/etc/mysql/debian.cnf <<< "FLUSH PRIVILEGES;"
 
 # change the hostname
@@ -63,4 +60,5 @@ sed -i "s/127.0.1.1.*$CURRENT_HOSTNAME/127.0.1.1\t$NEW_HOSTNAME/g" /etc/hosts
 # end messages
 echo "setup finish, take care to:"
 echo "-> make a reboot to update hostname"
+echo "-> ensure default admin password used for phpmyadmin is changed"
 echo "-> add a network conf if don't use standard eth0 with DHCP"
