@@ -2,8 +2,9 @@
 
 ## What this server do
 
-- provide a web server (Apache2 with PHP5) with a database (MySQL)
-- also add phpadmin for manage database
+- install a web server Apache2 with PHP (5 for jessie/7 for stretch)
+- install a database (MySQL for jessie or MariaDB for stretch)
+- also add phpmyadmin for manage the database
 
 ## Setup
 

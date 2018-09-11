@@ -2,10 +2,11 @@
 # setup server script from a custom Raspbian image
 #
 # form source image: rpi_jessie_lite-xxxxxxxx-custom_fr.img
+#                or: rpi_stretch_lite-xxxxxxxx-custom_fr.img
 
 # !!! define this before launch !!! 
 NEW_HOSTNAME="rpi_lamp"
-MYSQL_PWD="mysql"
+MYSQL_PWD="admin"
 
 # vars
 NAME=$(basename $0)
@@ -24,15 +25,15 @@ cd "$(dirname "$0")"
 export DEBIAN_FRONTEND=noninteractive
 
 # define mysql params
-debconf-set-selections <<< "mysql-server mysql-server/root_password password $MYSQL_PWD"
-debconf-set-selections <<< "mysql-server mysql-server/root_password_again password $MYSQL_PWD"
+#debconf-set-selections <<< "mysql-server mysql-server/root_password password $MYSQL_PWD"
+#debconf-set-selections <<< "mysql-server mysql-server/root_password_again password $MYSQL_PWD"
 
 # define phpmyadmin params
 debconf-set-selections <<<  "phpmyadmin phpmyadmin/reconfigure-webserver multiselect apache2"
 debconf-set-selections <<<  "phpmyadmin phpmyadmin/dbconfig-install boolean true"
-debconf-set-selections <<<  "phpmyadmin phpmyadmin/mysql/admin-user string root"
-debconf-set-selections <<<  "phpmyadmin phpmyadmin/mysql/admin-pass password $MYSQL_PWD"
-debconf-set-selections <<<  "phpmyadmin phpmyadmin/mysql/admin-pass password $MYSQL_PWD"
+#debconf-set-selections <<<  "phpmyadmin phpmyadmin/mysql/admin-user string root"
+#debconf-set-selections <<<  "phpmyadmin phpmyadmin/mysql/admin-pass password $MYSQL_PWD"
+#debconf-set-selections <<<  "phpmyadmin phpmyadmin/mysql/admin-pass password $MYSQL_PWD"
 #debconf-set-selections <<<  "phpmyadmin phpmyadmin/mysql/app-pass password your-app-db-pwd"
 #debconf-set-selections <<<  "phpmyadmin phpmyadmin/app-password-confirm password your-app-pwd"
 
@@ -46,8 +47,12 @@ mysql --defaults-file=/etc/mysql/debian.cnf <<< "DELETE FROM mysql.user WHERE Us
 mysql --defaults-file=/etc/mysql/debian.cnf <<< "DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');"
 mysql --defaults-file=/etc/mysql/debian.cnf <<< "DROP DATABASE IF EXISTS test;"
 mysql --defaults-file=/etc/mysql/debian.cnf <<< "DELETE FROM mysql.db WHERE Db='test' OR Db='test\\_%';"
+# create admin user for phpmyadmin
+mysql --defaults-file=/etc/mysql/debian.cnf <<< "CREATE USER 'admin'@'localhost' IDENTIFIED BY '$MYSQL_PWD';"
+mysql --defaults-file=/etc/mysql/debian.cnf <<< "GRANT ALL PRIVILEGES ON *.* TO 'admin'@'localhost' WITH GRANT OPTION;"
 # remove unix_socket to allow phpmyadmin root login (for debian stretch)
-[ $DEBIAN -eq 9 ] && { mysql --defaults-file=/etc/mysql/debian.cnf mysql <<< "UPDATE user SET plugin='' WHERE user='root';"; }
+#[ $DEBIAN -eq 9 ] && { mysql --defaults-file=/etc/mysql/debian.cnf mysql <<< "UPDATE user SET plugin='' WHERE user='root';"; }
+#[ $DEBIAN -eq 9 ] && { mysql --defaults-file=/etc/mysql/debian.cnf mysql <<< "UPDATE user SET password=PASSWORD('$MYSQL_PWD') where user='root';"; }
 mysql --defaults-file=/etc/mysql/debian.cnf <<< "FLUSH PRIVILEGES;"
 
 # change the hostname
