@@ -1,0 +1,55 @@
+rpi_fly_tvs
+-----------
+
+flyspray instance for TVS
+
+# SD card from scratch
+write custom image to SD card (like rpi_stretch_lite-20180911-custom_fr.img)
+boot from this card
+expand file system 
+  - raspi-config choices: 7 and A1
+  - reboot
+
+# init git dir
+mkdir -p /home/pi/git && cd /home/pi/git
+
+# clone github repos
+git clone https://github.com/sourceperl/mysql.tools
+git clone https://github.com/sourceperl/rpi.servers
+
+# setup mysql tools
+cd ~/git/mysql.tools && sudo ./setup.sh
+
+# setup lamp server
+cd ~/git/rpi.servers/rpi_lamp && sudo ./setup.sh
+connect to http://rpi_ip/phpmyadmin and update password of admin (default is admin)
+sudo reboot
+
+# add flyspray
+cd ~/git/rpi.servers/rpi_lamp/add_flyspray && sudo ./setup.sh
+sudo systemctl restart apache2
+change admin password with the web interface
+
+# currently we use flyspray release 0.9.9.7 (1.0 is always a rc)
+# on stretch php 7.0 can produce deprecated warning, to avoid this :
+sudo sed  -i "s/error_reporting(E_ALL);/error_reporting(E_ALL \& ~E_DEPRECATED \& ~E_STRICT);/"  /srv/flyspray/includes/fix.inc.php
+
+# html redirect for root path
+cat <<EOF | sudo tee /var/www/html/index.html 
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="refresh" content="0; URL=/flyspray" />
+  </head>
+  <body>
+  </body>
+</html>
+EOF
+
+# mysql backup
+
+# server backup
+
+# network setup
+
+# restore database (if replace an existing server)
