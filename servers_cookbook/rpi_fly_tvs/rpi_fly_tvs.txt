@@ -7,8 +7,9 @@ flyspray instance for TVS
 write custom image to SD card (like rpi_stretch_lite-20180911-custom_fr.img)
 boot from this card
 expand file system 
-  - raspi-config choices: 7 and A1
+  - raspi-config (choice A1)
   - reboot
+sudo apt-get update && sudo apt-get -y dist-upgrade
 
 # init git dir
 mkdir -p /home/pi/git && cd /home/pi/git
@@ -46,10 +47,30 @@ cat <<EOF | sudo tee /var/www/html/index.html
 </html>
 EOF
 
-# mysql backup
+# local mysql backup for DBs: flyspray, mysql
+cp usr/local/sbin/backup_mysql /usr/local/sbin/
+cp etc/cron.d/backup_mysql /etc/cron.d/
 
-# server backup
+# server backup: /boot and / to NAS server
+cp usr/local/sbin/send_to_nas /usr/local/sbin/
+cp etc/cron.d/send_to_nas /etc/cron.d/
 
 # network setup
+cat <<EOF | sudo tee -a /etc/dhcpcd.conf
+# set static IP (add by LLe)
+interface eth0
+static ip_address=163.112.88.7/24
+static routers=163.112.88.1
+EOF
 
-# restore database (if replace an existing server)
+# restore flyspray database (if replace an existing server)
+sudo mysql_import flyspray flyspray-data.sql.gz
+
+# restore flyspray attachments files
+sudo cp -r /path/to/attachments /srv/flyspray/attachments
+sudo chown -R www-data:www-data /srv/flyspray/attachments
+
+# change hostname
+  - raspi-config (choice N1)
+  - reboot
+
