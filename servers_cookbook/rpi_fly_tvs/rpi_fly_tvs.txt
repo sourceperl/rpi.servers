@@ -18,6 +18,7 @@ mkdir -p /home/pi/git && cd /home/pi/git
 git clone https://github.com/sourceperl/mysql.tools
 git clone https://github.com/billw2/rpi-clone
 git clone https://github.com/sourceperl/rpi.servers
+git clone https://github.com/sourceperl/rpi.pi-desktop-manager.git
 
 # setup mysql tools
 cd ~/git/mysql.tools && sudo ./setup.sh
@@ -53,12 +54,13 @@ cat <<EOF | sudo tee /var/www/html/index.html
 EOF
 
 # local mysql backup for DBs: flyspray, mysql
-cp usr/local/sbin/backup_mysql /usr/local/sbin/
-cp etc/cron.d/backup_mysql /etc/cron.d/
+cd ~/git/rpi.servers/servers_cookbook/rpi_fly_tvs/
+sudo cp usr/local/sbin/backup_mysql /usr/local/sbin/
+sudo cp etc/cron.d/backup_mysql /etc/cron.d/
 
 # server backup: /boot and / to NAS server
-cp usr/local/sbin/send_to_nas /usr/local/sbin/
-cp etc/cron.d/send_to_nas /etc/cron.d/
+sudo cp usr/local/sbin/send_fs_to_nas /usr/local/sbin/
+sudo cp etc/cron.d/send_to_nas /etc/cron.d/
 
 # network setup
 cat <<EOF | sudo tee -a /etc/dhcpcd.conf
