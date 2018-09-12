@@ -16,10 +16,15 @@ mkdir -p /home/pi/git && cd /home/pi/git
 
 # clone github repos
 git clone https://github.com/sourceperl/mysql.tools
+git clone https://github.com/billw2/rpi-clone
 git clone https://github.com/sourceperl/rpi.servers
 
 # setup mysql tools
 cd ~/git/mysql.tools && sudo ./setup.sh
+
+# setup rpi-clone
+cd ~/git/rpi-clone
+sudo cp rpi-clone rpi-clone-setup /usr/local/sbin
 
 # setup lamp server
 cd ~/git/rpi.servers/rpi_lamp && sudo ./setup.sh
