@@ -38,7 +38,7 @@ debconf-set-selections <<<  "phpmyadmin phpmyadmin/dbconfig-install boolean true
 #debconf-set-selections <<<  "phpmyadmin phpmyadmin/app-password-confirm password your-app-pwd"
 
 # install packages (for debian jessie or stretch)
-apt-get update && apt-get -y upgrade
+#apt-get update && apt-get -y upgrade
 [ $DEBIAN -eq 8 ] && { apt-get install -y apache2 php5 mysql-server php5-mysql phpmyadmin; }
 [ $DEBIAN -eq 9 ] && { apt-get install -y apache2 php7.0 mysql-server php7.0-mysql phpmyadmin; }
 

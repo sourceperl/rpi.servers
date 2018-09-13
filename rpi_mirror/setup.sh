@@ -25,7 +25,7 @@ cd "$(dirname "$0")"
 set -e
 
 # install packages
-apt-get update && apt-get -y upgrade
+#apt-get update && apt-get -y upgrade
 apt-get -y install apt-mirror apache2
 
 # configure fstab (add mountpoints for USB HDD and USB KEY)

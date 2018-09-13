@@ -22,7 +22,7 @@ cd "$(dirname "$0")"
 umask 022
 
 # install packages
-apt-get update && apt-get -y upgrade
+#apt-get update && apt-get -y upgrade
 apt-get install -y isc-dhcp-server
 
 # set static IP address
