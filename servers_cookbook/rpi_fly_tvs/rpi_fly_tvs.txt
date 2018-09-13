@@ -41,6 +41,10 @@ change admin password with the web interface
 # on stretch php 7.0 can produce deprecated warning, to avoid this :
 sudo sed  -i "s/error_reporting(E_ALL);/error_reporting(E_ALL \& ~E_DEPRECATED \& ~E_STRICT);/"  /srv/flyspray/includes/fix.inc.php
 
+# update web server files
+sed -i "s/'Catégorie'/'Exploitant'/g" /srv/flyspray/lang/fr.php
+sed -i "s/'Etat'/'Etat ticket'/g" /srv/flyspray/lang/fr.php
+
 # html redirect for root path
 cat <<EOF | sudo tee /var/www/html/index.html 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
