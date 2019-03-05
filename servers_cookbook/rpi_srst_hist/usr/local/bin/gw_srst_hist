@@ -1,0 +1,50 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+import logging
+import sys
+import time
+import traceback
+from influxdb import InfluxDBClient
+import requests
+
+# some const
+URL_EXP_TM = "http://163.111.168.11:8080/exp_mbus_tm.json"
+
+# logging setup
+logging.basicConfig(format="%(asctime)s %(message)s")
+
+# connect to influxdb DB
+idb = InfluxDBClient(host="localhost", port=8086, 
+                     username="gw_srst_hist", password="gw_srst_hist")
+idb.switch_database("srst_historian")
+
+while True:
+    try:
+        l_metrics = []
+        # get data
+        r = requests.get(url=URL_EXP_TM)
+        for d in r.json():
+            # update metrics
+            l_metrics.append(
+                {
+                    "measurement": "srst_tm",
+                    "tags": {
+                        "tag": d["tag"],
+                        "unit": d["unit"],
+                    },
+                    "fields": {
+                        "value": d["tm"],
+                    },
+                },
+            )
+        idb.write_points(points=l_metrics)
+        # wait for next update
+        time.sleep(30.0)
+    except KeyboardInterrupt:
+        break
+    except:
+        # log except to stderr
+        logging.error(traceback.format_exc())
+        # wait before next try
+        time.sleep(30.0)
