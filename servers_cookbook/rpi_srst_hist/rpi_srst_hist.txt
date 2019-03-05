@@ -48,6 +48,7 @@ sudo vim /etc/influxdb/influxdb.conf
 sudo systemctl restart influxd
 
 # grafana setup
+sudo systemctl enable grafana-server.service
 sudo systemctl start grafana-server.service
 # open browser to http://<IP OF RPI>:3000/ 
 #   - connect to grafana with admin/admin auth
