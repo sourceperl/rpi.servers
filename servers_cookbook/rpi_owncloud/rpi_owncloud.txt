@@ -1,0 +1,67 @@
+rpi_owncloud
+------------
+
+# owncloud instance for file sharing
+
+# SD card from scratch
+write custom image to SD card (like rpi_stretch_lite-20180911-custom_fr.img)
+boot from this card
+expand file system
+  - raspi-config (choice A1)
+  - reboot
+sudo apt-get update && sudo apt-get -y dist-upgrade
+
+# add debian packages
+sudo apt-get -y install apt-transport-https hexedit vim nmap lftp git minicom lsof tree ntfs-3g
+
+# init git dir
+mkdir -p /home/pi/git && cd /home/pi/git
+
+# clone github repos
+git clone https://github.com/sourceperl/mysql.tools
+git clone https://github.com/billw2/rpi-clone
+git clone https://github.com/sourceperl/rpi.servers
+git clone https://github.com/sourceperl/rpi.pi-desktop-manager.git
+
+# setup mysql tools
+cd ~/git/mysql.tools && sudo ./setup.sh
+
+# setup rpi-clone
+cd ~/git/rpi-clone
+sudo cp rpi-clone rpi-clone-setup /usr/local/sbin
+
+# setup lamp server
+cd ~/git/rpi.servers/rpi_lamp && sudo ./setup.sh
+connect to http://rpi_ip/phpmyadmin and update password of admin (default is admin)
+sudo reboot
+
+# add package need by owncloud
+sudo apt install -y php-imagick php7.0-common php7.0-curl php7.0-gd php7.0-imap php7.0-intl php7.0-json php7.0-ldap php7.0-mbstring php7.0-mcrypt
+sudo apt install -y php7.0-mysql php7.0-pgsql php-smbclient php-ssh2 php7.0-sqlite3 php7.0-xml php7.0-zip php-redis php-apcu php7.0-fpm
+
+# install owncloud package (from official source)
+wget -qO- https://download.owncloud.org/download/repositories/stable/Debian_9.0/Release.key | sudo apt-key add -
+echo 'deb https://download.owncloud.org/download/repositories/stable/Debian_9.0/ /' | sudo tee /etc/apt/sources.list.d/owncloud.list
+sudo apt-get update && sudo apt install -y owncloud-files
+
+# setup mariadb for owncloud
+sudo mysql --defaults-file=/etc/mysql/debian.cnf <<< "CREATE DATABASE owncloud CHARACTER SET utf8;"
+sudo mysql --defaults-file=/etc/mysql/debian.cnf <<< "GRANT ALL PRIVILEGES ON owncloud.* TO 'owncloud'@'localhost' IDENTIFIED BY 'pwd_owncloud';"
+sudo mysql --defaults-file=/etc/mysql/debian.cnf <<< "FLUSH PRIVILEGES;"
+
+# local mysql backup for DBs: owncloud, mysql
+cd ~/git/rpi.servers/servers_cookbook/rpi_owncloud/
+sudo cp etc/apache2/conf-available/owncloud.conf /etc/apache2/conf-available/
+sudo a2enconf owncloud.conf
+sudo systemctl restart apache2
+
+# !!! connect to http://localhost/owncloud and define admin account and maria-DB params !!!
+
+# local mysql backup for DBs: owncloud, mysql
+cd ~/git/rpi.servers/servers_cookbook/rpi_owncloud/
+sudo cp usr/local/sbin/backup_mysql /usr/local/sbin/
+sudo cp etc/cron.d/backup_mysql /etc/cron.d/
+
+# change hostname to rpi_owncloud
+  - raspi-config (choice N1)
+  - reboot

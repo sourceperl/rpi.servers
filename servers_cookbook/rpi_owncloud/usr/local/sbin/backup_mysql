@@ -1,0 +1,24 @@
+#!/bin/bash
+# mysql backup script
+
+# vars
+NAME=$(basename $0)
+
+# some checks
+[ $EUID -ne 0 ] && { printf "ERROR: $NAME needs to be run by root\n" 1>&2; exit 1; }
+
+# commands and options
+CMD_DUMP="mysqldump --defaults-file=/etc/mysql/debian.cnf"
+DUMP_MYI_OPT="--routines --triggers --events --lock-tables"
+DUMP_INO_OPT="--routines --triggers --events --single-transaction"
+
+# backup owncloud
+DB="owncloud"
+$CMD_DUMP -d $DUMP_INO_OPT $DB | gzip > /var/backups/$DB-struct.sql.gz
+$CMD_DUMP -t $DUMP_INO_OPT $DB | gzip > /var/backups/$DB-data.sql.gz
+
+# backup mysql
+DB="mysql"
+$CMD_DUMP -d $DUMP_MYI_OPT $DB | gzip > /var/backups/$DB-struct.sql.gz
+$CMD_DUMP -t $DUMP_MYI_OPT $DB | gzip > /var/backups/$DB-data.sql.gz
+
