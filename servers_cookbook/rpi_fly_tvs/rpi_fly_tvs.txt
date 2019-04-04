@@ -11,6 +11,15 @@ expand file system
   - reboot
 sudo apt-get update && sudo apt-get -y dist-upgrade
 
+# add debian packages
+sudo apt-get -y install hexedit vim nmap lftp git minicom lsof tree ntfs-3g
+sudo apt-get -y install ipython ipython3 python-setuptools python3-setuptools
+sudo apt-get -y install python-pip python3-pip
+
+# add python packages
+sudo pip3 install schedule
+sudo pip3 install PyMySQL
+
 # init git dir
 mkdir -p /home/pi/git && cd /home/pi/git
 
