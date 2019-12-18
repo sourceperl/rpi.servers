@@ -41,6 +41,7 @@ debconf-set-selections <<<  "phpmyadmin phpmyadmin/dbconfig-install boolean true
 #apt-get update && apt-get -y upgrade
 [ $DEBIAN -eq 8 ] && { apt-get install -y apache2 php5 mysql-server php5-mysql phpmyadmin; }
 [ $DEBIAN -eq 9 ] && { apt-get install -y apache2 php7.0 mysql-server php7.0-mysql phpmyadmin; }
+[ $DEBIAN -eq 10 ] && { apt-get install -y apache2 php7.3 mariadb-server php7.3-mysql phpmyadmin; }
 
 # secure mysql
 mysql --defaults-file=/etc/mysql/debian.cnf <<< "DELETE FROM mysql.user WHERE User='';"
