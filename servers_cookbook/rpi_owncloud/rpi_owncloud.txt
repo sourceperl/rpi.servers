@@ -36,12 +36,18 @@ connect to http://rpi_ip/phpmyadmin and update password of admin (default is adm
 sudo reboot
 
 # add package need by owncloud
-sudo apt install -y php-imagick php7.0-common php7.0-curl php7.0-gd php7.0-imap php7.0-intl php7.0-json php7.0-ldap php7.0-mbstring php7.0-mcrypt
-sudo apt install -y php7.0-mysql php7.0-pgsql php-smbclient php-ssh2 php7.0-sqlite3 php7.0-xml php7.0-zip php-redis php-apcu php7.0-fpm
+DEBIAN=$(sed 's/\..*//' /etc/debian_version)
+if [ $DEBIAN -eq 9 ]; then  
+  sudo apt install -y php-imagick php7.0-common php7.0-curl php7.0-gd php7.0-imap php7.0-intl php7.0-json php7.0-ldap php7.0-mbstring php7.0-mcrypt
+  sudo apt install -y php7.0-mysql php7.0-pgsql php-smbclient php-ssh2 php7.0-sqlite3 php7.0-xml php7.0-zip php-redis php-apcu php7.0-fpm
+fi
+if [ $DEBIAN -eq 10 ]; then
+  sudo apt install -y php-intl
+fi
 
 # install owncloud package (from official source)
-wget -qO- https://download.owncloud.org/download/repositories/stable/Debian_9.0/Release.key | sudo apt-key add -
-echo 'deb https://download.owncloud.org/download/repositories/stable/Debian_9.0/ /' | sudo tee /etc/apt/sources.list.d/owncloud.list
+[ $DEBIAN -eq 10 ] && { wget -qO- https://download.owncloud.org/download/repositories/stable/Debian_9.0/Release.key | sudo apt-key add -
+[ $DEBIAN -eq 10 ] && { echo 'deb https://download.owncloud.org/download/repositories/stable/Debian_9.0/ /' | sudo tee /etc/apt/sources.list.d/owncloud.list
 sudo apt-get update && sudo apt install -y owncloud-files
 
 # setup mariadb for owncloud
