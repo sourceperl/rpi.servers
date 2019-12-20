@@ -75,6 +75,11 @@ cd ~/git/rpi.servers/servers_cookbook/rpi_owncloud/
 sudo cp usr/local/sbin/backup_mysql /usr/local/sbin/
 sudo cp etc/cron.d/backup_mysql /etc/cron.d/
 
+# turn on HTTPS (tcp/443) with self-signed certificate
+sudo a2enmod ssl
+sudo a2ensite default-ssl.conf 
+sudo systemctl restart apache2
+
 # change hostname to rpi_owncloud
-  - raspi-config (choice N1)
-  - reboot
+#  - raspi-config (choice N1)
+#  - reboot
