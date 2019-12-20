@@ -54,7 +54,7 @@ fi
 if [ $DEBIAN -eq 10 ]; then  
   wget -qO- https://download.owncloud.org/download/repositories/stable/Debian_10/Release.key | sudo apt-key add -
   echo 'deb https://download.owncloud.org/download/repositories/stable/Debian_10/ /' | sudo tee /etc/apt/sources.list.d/owncloud.list
-  sudo apt-get update && sudo apt install -y owncloud
+  sudo apt-get update && sudo apt install -y owncloud-files
 fi
 
 # setup mariadb for owncloud
