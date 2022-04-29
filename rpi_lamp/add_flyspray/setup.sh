@@ -19,10 +19,10 @@ cd "$(dirname "$0")"
 # configure DB
 echo "configure DB"
 SQL="CREATE DATABASE IF NOT EXISTS flyspray DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;"
-echo $SQL | mysql --defaults-file=/etc/mysql/debian.cnf
+echo $SQL | sudo mysql --defaults-file=/etc/mysql/debian.cnf
 SQL="GRANT SELECT,INSERT,UPDATE,DELETE,CREATE,DROP,INDEX,ALTER,CREATE TEMPORARY TABLES ON flyspray.*
      TO flysprayuser@localhost IDENTIFIED BY '$FLY_PWD';"
-echo $SQL | mysql --defaults-file=/etc/mysql/debian.cnf
+echo $SQL | sudo mysql --defaults-file=/etc/mysql/debian.cnf
 
 # init flyspray DB
 echo "init DB"

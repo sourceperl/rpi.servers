@@ -1,0 +1,38 @@
+##################################
+# basic LAMP setup for debian 11 #
+##################################
+
+
+# add misc package
+sudo apt install -y fail2ban ufw python3-schedule python3-pymysql vim \
+                    git pv tree ack 
+
+# turn on firewall, allow remote ssh login before
+sudo ufw allow 192.168.0.0/16 to any port ssh
+sudo ufw enable
+
+# add HTTP server with PHP
+sudo apt install -y apache2 php7.4
+
+# maria DB setup
+sudo apt install -y mariadb-server-10.5
+# script tp secure mariadb
+sudo mysql_secure_installation
+# apply this:
+#   Enter current password for root (enter for none): <Enter>
+#   Switch to unix_socket authentication [Y/n] Y
+#   Change the root password? [Y/n] n
+#   Remove anonymous users? [Y/n] Y
+#   Disallow root login remotely? [Y/n] Y
+#   Remove test database and access to it? [Y/n] Y
+#   Reload privilege tables now? [Y/n] Y
+
+# phpmyadmin setup (in setup menu choose to configure apache2 server)
+sudo apt install -y phpmyadmin 
+
+# add admin user for phpmyadmin
+sudo mysql <<EOF
+CREATE USER 'admin'@'localhost' IDENTIFIED BY 'my admin password';
+GRANT ALL PRIVILEGES ON *.* TO 'admin'@'localhost' WITH GRANT OPTION;
+FLUSH PRIVILEGES;
+EOF
