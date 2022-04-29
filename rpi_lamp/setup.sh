@@ -1,5 +1,5 @@
 #!/bin/bash
-# setup server script from a custom Raspbian image
+# setup server script from a custom Raspbian image (for debian 8,9 and 10)
 #
 # form source image: rpi_jessie_lite-xxxxxxxx-custom_fr.img
 #                or: rpi_stretch_lite-xxxxxxxx-custom_fr.img
