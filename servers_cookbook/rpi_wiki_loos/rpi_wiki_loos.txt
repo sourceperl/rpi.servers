@@ -30,10 +30,8 @@ cd ~/git/mysql.tools && sudo ./setup.sh
 cd ~/git/rpi-clone
 sudo cp rpi-clone rpi-clone-setup /usr/local/sbin
 
-# setup lamp server
-cd ~/git/rpi.servers/rpi_lamp && sudo ./setup.sh
-connect to http://rpi_ip/phpmyadmin and update password of admin (default is admin)
-sudo reboot
+# setup a lamp server
+# see instructions in ~/git/rpi.servers/rpi_lamp
 
 # add mediawiki
 cd ~/git/rpi.servers/rpi_lamp/add_mediawiki && sudo ./setup.sh
