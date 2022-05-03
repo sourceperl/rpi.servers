@@ -1,0 +1,87 @@
+rpi_fly_tne
+-----------
+
+flyspray instance for TNE
+
+# start from a 64 bits debian bullseye image
+
+# make sure these packages are available
+sudo apt install -y git
+
+# init git dir
+mkdir -p /home/pi/git && cd /home/pi/git
+
+# clone github repos
+git clone https://github.com/sourceperl/mysql.tools
+git clone https://github.com/sourceperl/rpi.servers
+
+# setup mysql tools
+cd ~/git/mysql.tools && sudo ./setup.sh
+
+# setup a lamp server
+# see instructions in ~/git/rpi.servers/rpi_lamp
+
+# add flyspray
+# this add flyspray 0.9.9.7 web base files
+# this init mysql flyspray DB struct (and some default data) and set credential for it.
+cd ~/git/rpi.servers/rpi_lamp/add_flyspray && sudo ./setup.sh
+sudo systemctl restart apache2
+# change flyspray admin password with the web interface (default is 12345678)
+
+# restore flyspray database (if replace an existing server)
+# truncate all tables actual content in flyspray database
+sudo sh -c  'mysql -Nse "show tables" flyspray | while read table; do mysql -e "truncate table $table;" flyspray; done'
+# fill tables with backup content
+zcat flyspray-data.sql.gz | sudo mysql flyspray
+
+# update web server files
+# currently we use flyspray release 0.9.9.7 (1.0 is always a rc)
+# on stretch php 7.0 can produce deprecated warning, to avoid this :
+sudo sed  -i "s/error_reporting(E_ALL);/error_reporting(E_ALL \& ~E_DEPRECATED \& ~E_STRICT);/"  /srv/flyspray/includes/fix.inc.php
+# update translate file to conform to local usage
+sudo sed -i "s/'Catégorie'/'Exploitant'/g" /srv/flyspray/lang/fr.php
+sudo sed -i "s/'Catégories'/'Exploitants'/g" /srv/flyspray/lang/fr.php
+sudo sed -i "s/'Etat'/'Etat ticket'/g" /srv/flyspray/lang/fr.php
+
+# html redirect for root path
+cat <<EOF | sudo tee /var/www/html/index.html 
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="refresh" content="0; URL=/flyspray" />
+  </head>
+  <body>
+  </body>
+</html>
+EOF
+
+# local mysql backup for DBs: flyspray, mysql
+cd ~/git/rpi.servers/servers_cookbook/rpi_fly_tvs/
+sudo cp usr/local/sbin/backup_mysql /usr/local/sbin/
+sudo cp etc/cron.d/backup_mysql /etc/cron.d/
+
+# server backup: /boot and / to NAS server
+sudo cp usr/local/sbin/send_fs_to_nas /usr/local/sbin/
+sudo cp etc/cron.d/send_to_nas /etc/cron.d/
+
+# network setup
+cat <<EOF | sudo tee -a /etc/dhcpcd.conf
+# set static IP (add by LLe)
+interface eth0
+static ip_address=163.111.168.14/24
+static routers=163.111.168.1
+EOF
+
+# update time sources
+sudo sed -i "s/^#NTP=/NTP=10.148.63.25 10.147.32.53/" /etc/systemd/timesyncd.conf
+
+# restore flyspray attachments files
+sudo cp -r /path/to/attachments /srv/flyspray/attachments
+sudo chown -R www-data:www-data /srv/flyspray/attachments
+# for file upload works
+sudo chmod u+x /srv/flyspray/attachments/
+
+# change hostname
+  - raspi-config (choice N1)
+  - reboot
+
