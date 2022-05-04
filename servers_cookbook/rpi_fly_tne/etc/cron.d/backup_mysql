@@ -1,0 +1,6 @@
+#
+# Regular cron jobs for the backup of databases
+#
+
+# backup databases, run every day at 6h00
+0 6 * * * root /usr/local/sbin/backup_mysql >/dev/null 2>&1

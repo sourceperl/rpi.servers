@@ -1,0 +1,112 @@
+diff -Naur '--exclude=attachments' '--exclude=flyspray.conf.php' '--exclude=lang' origin/flyspray/includes/class.flyspray.php target/flyspray/includes/class.flyspray.php
+--- origin/flyspray/includes/class.flyspray.php	2012-05-28 10:34:46.000000000 +0200
++++ target/flyspray/includes/class.flyspray.php	2022-04-29 14:55:13.927050962 +0200
+@@ -86,8 +86,8 @@
+                 continue;
+             }
+ 
+-            $val = trim($val);
+             $last = strtolower($val{strlen($val)-1});
++            $val = trim($val, 'gGmMkK');
+             switch ($last) {
+                 // The 'G' modifier is available since PHP 5.1.0
+                 case 'g':
+diff -Naur '--exclude=attachments' '--exclude=flyspray.conf.php' '--exclude=lang' origin/flyspray/includes/external/sparkline/Object.php target/flyspray/includes/external/sparkline/Object.php
+--- origin/flyspray/includes/external/sparkline/Object.php	2012-03-31 23:07:18.000000000 +0200
++++ target/flyspray/includes/external/sparkline/Object.php	2022-05-02 11:43:45.757626814 +0200
+@@ -68,7 +68,7 @@
+   }
+ } // function log_write
+ 
+-class Object {
++class BaseObject {
+ 
+   var $isError;
+   var $logFile;
+@@ -153,4 +153,4 @@
+     return $this->isError;
+   } // function IsError
+ 
+-} // class Object
+\ Pas de fin de ligne à la fin du fichier
++} // class Object
+diff -Naur '--exclude=attachments' '--exclude=flyspray.conf.php' '--exclude=lang' origin/flyspray/includes/external/sparkline/Sparkline.php target/flyspray/includes/external/sparkline/Sparkline.php
+--- origin/flyspray/includes/external/sparkline/Sparkline.php	2012-03-31 23:07:18.000000000 +0200
++++ target/flyspray/includes/external/sparkline/Sparkline.php	2022-05-02 11:44:10.705455641 +0200
+@@ -23,7 +23,7 @@
+ 
+ require_once('Object.php');
+ 
+-class Sparkline extends Object {
++class Sparkline extends BaseObject {
+ 
+   var $imageX;
+   var $imageY;
+diff -Naur '--exclude=attachments' '--exclude=flyspray.conf.php' '--exclude=lang' origin/flyspray/includes/fix.inc.php target/flyspray/includes/fix.inc.php
+--- origin/flyspray/includes/fix.inc.php	2012-03-23 22:19:30.000000000 +0100
++++ target/flyspray/includes/fix.inc.php	2022-05-02 13:30:02.798500698 +0200
+@@ -13,7 +13,7 @@
+ 
+ defined('E_DEPRECATED') || define('E_DEPRECATED', 8192);
+ 
+-error_reporting(E_ALL);
++error_reporting(E_ALL & ~E_DEPRECATED & ~E_STRICT);
+ 
+ // our default charset
+ 
+diff -Naur '--exclude=attachments' '--exclude=flyspray.conf.php' '--exclude=lang' origin/flyspray/scripts/details.php target/flyspray/scripts/details.php
+--- origin/flyspray/scripts/details.php	2008-02-09 08:47:36.000000000 +0100
++++ target/flyspray/scripts/details.php	2022-05-04 08:09:35.660041141 +0200
+@@ -124,10 +124,10 @@
+                             ORDER BY v.date_time DESC',
+                             array($task_id));
+ 
+-    if ($task_details['last_edited_time'] > $cached['last_updated'] || !defined('FLYSPRAY_USE_CACHE')) {
+-        $task_text = TextFormatter::render($task_details['detailed_desc'], false, 'task', $task_details['task_id']);
+-    } else {
++    if (defined('FLYSPRAY_USE_CACHE') && is_array($cached) && task_details['last_edited_time'] <= $cached['last_updated']) {
+         $task_text = TextFormatter::render($task_details['detailed_desc'], false, 'task', $task_details['task_id'], $cached['content']);
++    } else {
++        $task_text = TextFormatter::render($task_details['detailed_desc'], false, 'task', $task_details['task_id']);
+     }
+ 
+     $page->assign('prev_id',   $prev_id);
+diff -Naur '--exclude=attachments' '--exclude=flyspray.conf.php' '--exclude=lang' origin/flyspray/scripts/reports.php target/flyspray/scripts/reports.php
+--- origin/flyspray/scripts/reports.php	2007-10-23 19:47:08.000000000 +0200
++++ target/flyspray/scripts/reports.php	2022-05-02 13:41:08.314373139 +0200
+@@ -89,7 +89,7 @@
+         }
+ }
+ 
+-if (count(Req::val('events'))) {
++if (count(Req::val('events', array()))) {
+     $histories = $db->Query("SELECT h.*
+                         FROM  {history} h
+                    LEFT JOIN {tasks} t ON h.task_id = t.task_id
+diff -Naur '--exclude=attachments' '--exclude=flyspray.conf.php' '--exclude=lang' origin/flyspray/themes/CleanFS/templates/toplevel.tpl target/flyspray/themes/CleanFS/templates/toplevel.tpl
+--- origin/flyspray/themes/CleanFS/templates/toplevel.tpl	2012-05-28 10:31:18.000000000 +0200
++++ target/flyspray/themes/CleanFS/templates/toplevel.tpl	2022-05-04 08:20:51.541318863 +0200
+@@ -47,23 +47,6 @@
+     <?php endif; ?>
+ 
+   </tr>
+-  <?php if (!$user->isAnon()): ?>
+-  <tr>
+-  	<th><strong>Activity</strong>
+-  	<td><img src="{$_SERVER['SCRIPT_NAME']}?do=activity&amp;user_id={$user->id}&amp;project_id={$project['project_id']}&amp;graph=project"/></td>
+-  </tr>
+- 
+-  <tr>
+-  	<th><strong>My Activity</strong>
+-  	<td><img src="{$_SERVER['SCRIPT_NAME']}?do=activity&amp;user_id={$user->id}&amp;project_id={$project['project_id']}&amp;graph=user"/></td>
+-  </tr>
+-  <?php endif; ?>
+-  <?php if ($user->isAnon()): ?>
+-    <tr>
+-  	<th><strong>Activity</strong>
+-  	<td><img src="{$_SERVER['SCRIPT_NAME']}?do=activity&amp;project_id={$project['project_id']}"/></td>
+-  </tr>
+-  <?php endif; ?>
+   <tr>
+     <th><strong>{L('stats')}</strong></th>
+     <td>{$stats[$project['project_id']]['open']} {L('opentasks')}, {$stats[$project['project_id']]['all']} {L('totaltasks')}.</td>

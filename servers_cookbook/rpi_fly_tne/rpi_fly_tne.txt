@@ -35,16 +35,15 @@ sudo sh -c  'mysql -Nse "show tables" flyspray | while read table; do mysql -e "
 zcat flyspray-data.sql.gz | sudo mysql flyspray
 
 # update web server files
+# translate file to conform to local usage (customize it)
+sudo patch /srv/flyspray/lang/fr.php < patches/tne_custom_fr.patch
 # currently we use flyspray release 0.9.9.7 (1.0 is always a rc)
-# on stretch php 7.0 can produce deprecated warning, to avoid this :
-sudo sed  -i "s/error_reporting(E_ALL);/error_reporting(E_ALL \& ~E_DEPRECATED \& ~E_STRICT);/"  /srv/flyspray/includes/fix.inc.php
-# update translate file to conform to local usage
-sudo sed -i "s/'Catégorie'/'Exploitant'/g" /srv/flyspray/lang/fr.php
-sudo sed -i "s/'Catégories'/'Exploitants'/g" /srv/flyspray/lang/fr.php
-sudo sed -i "s/'Etat'/'Etat ticket'/g" /srv/flyspray/lang/fr.php
+# on bullseye php 7.4 can produce deprecated warning and other errors
+# messages to avoid this :
+sudo patch -p2 --directory=/srv/flyspray/ < patches/fly_compat_php7_4.patch
 
-# html redirect for root path
-cat <<EOF | sudo tee /var/www/html/index.html 
+# add html redirect for path /
+cat <<EOF | sudo tee /var/www/html/index.html
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
@@ -55,12 +54,12 @@ cat <<EOF | sudo tee /var/www/html/index.html
 </html>
 EOF
 
-# local mysql backup for DBs: flyspray, mysql
-cd ~/git/rpi.servers/servers_cookbook/rpi_fly_tvs/
+# add local mysql backup for DBs: flyspray, mysql
+cd ~/git/rpi.servers/servers_cookbook/rpi_fly_tne/
 sudo cp usr/local/sbin/backup_mysql /usr/local/sbin/
 sudo cp etc/cron.d/backup_mysql /etc/cron.d/
 
-# server backup: /boot and / to NAS server
+# add server backup: /boot and / to NAS server
 sudo cp usr/local/sbin/send_fs_to_nas /usr/local/sbin/
 sudo cp etc/cron.d/send_to_nas /etc/cron.d/
 

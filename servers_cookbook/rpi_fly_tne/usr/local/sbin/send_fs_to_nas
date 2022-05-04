@@ -1,0 +1,12 @@
+#!/bin/bash
+# full transfert of boot and root fs to Loos NAS server Sv5
+
+# vars
+NAME=$(basename $0)
+
+# check root
+[ $EUID -ne 0 ] && { printf "ERROR: $NAME needs to be run by root\n" 1>&2; exit 1; }
+
+# start rsync
+rsync -aAxX --delete /boot/. 163.111.168.16::sv_auto_backup/rpi_flyspray_1/fs/boot/.
+rsync -aAxX --delete /. 163.111.168.16::sv_auto_backup/rpi_flyspray_1/fs/root/.

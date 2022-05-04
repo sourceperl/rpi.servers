@@ -1,0 +1,24 @@
+--- origin/flyspray/lang/fr.php	2007-03-24 13:26:28.000000000 +0100
++++ target/flyspray/lang/fr.php	2017-04-28 10:35:23.000000000 +0200
+@@ -107,9 +107,9 @@
+ 'edittask'                => 'Editer cette tâche',
+ 'openedby'                => 'Ouverte par',
+ 'editedby'                => 'Dernière édition par',
+-'tasktype'                => 'Type de tâche',
+-'category'                => 'Catégorie',
+-'status'                  => 'Etat',
++'tasktype'                => 'Equipe DTS',
++'category'                => 'Exploitant',
++'status'                  => 'Etat ticket',
+ 'assignedto'              => 'Assignée à',
+ 'operatingsystem'         => 'Système d\'exploitation',
+ 'severity'                => 'Sévérité',
+@@ -233,7 +233,7 @@
+ 'logout'                  => 'Se déconnecter',
+ 'usersandgroups'          => 'Utilisateurs & Groupes',
+ 'tasktypes'               => 'Types de tâche',
+-'categories'              => 'Catégories',
++'categories'              => 'Exploitants',
+ 'operatingsystems'        => 'Systèmes d\'exploitation',
+ 'resolutions'             => 'Raisons de cloture',
+ 'versions'                => 'Versions',
