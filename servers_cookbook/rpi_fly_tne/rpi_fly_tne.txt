@@ -25,6 +25,22 @@ cd ~/git/mysql.tools && sudo ./setup.sh
 # this add flyspray 0.9.9.7 web base files
 # this init mysql flyspray DB struct (and some default data) and set credential for it.
 cd ~/git/rpi.servers/rpi_lamp/add_flyspray && sudo ./setup.sh
+# turn on https
+sudo a2ensite default-ssl.conf
+sudo a2enmod ssl
+# add private key and certificate
+sudo mkdir /etc/apache2/ssl
+# locate the cert and key and copy it to server
+sudo cp loos-flyspray-1.* /etc/apache2/ssl/
+sudo chown root:root /etc/apache2/ssl/loos-flyspray-1.cert
+sudo chmod 0644 /etc/apache2/ssl/loos-flyspray-1.cert
+sudo chown root:ssl-cert /etc/apache2/ssl/loos-flyspray-1.key
+sudo chmod 0640 /etc/apache2/ssl/loos-flyspray-1.cert
+# edit conf file lines 32 and 33 like this:
+#   SSLCertificateFile    /etc/apache2/ssl/loos-flyspray-1.cert
+#   SSLCertificateKeyFile /etc/apache2/ssl/loos-flyspray-1.key
+sudo vim /etc/apache2/sites-available/default-ssl.conf
+# restart apache2
 sudo systemctl restart apache2
 # change flyspray admin password with the web interface (default is 12345678)
 
@@ -83,4 +99,3 @@ sudo chmod u+x /srv/flyspray/attachments/
 # change hostname
   - raspi-config (choice N1)
   - reboot
-
