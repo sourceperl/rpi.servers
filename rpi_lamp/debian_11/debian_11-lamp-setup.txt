@@ -3,7 +3,7 @@
 ##################################
 
 
-# add misc package
+# add misc package
 sudo apt install -y fail2ban ufw python3-schedule python3-pymysql vim \
                     git pv tree ack 
 
@@ -28,7 +28,11 @@ sudo mysql_secure_installation
 #   Reload privilege tables now? [Y/n] Y
 
 # phpmyadmin setup (in setup menu choose to configure apache2 server)
-sudo apt install -y phpmyadmin 
+sudo apt install -y phpmyadmin
+
+# secure phpmyadmin
+# deny all mysql users, except for admin user
+sudo patch --directory=/etc/phpmyadmin/ < patches/pma_deny_users.patch
 
 # add admin user for phpmyadmin
 sudo mysql <<EOF

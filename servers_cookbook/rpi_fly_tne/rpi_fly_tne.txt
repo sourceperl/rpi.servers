@@ -30,15 +30,24 @@ sudo a2ensite default-ssl.conf
 sudo a2enmod ssl
 # add private key and certificate
 sudo mkdir /etc/apache2/ssl
+sudo mkdir /etc/apache2/certs
+sudo chown root:root /etc/apache2/certs
+sudo chmod 0755 /etc/apache2/certs
+sudo mkdir /etc/apache2/private
+sudo chown root:ssl-cert /etc/apache2/private
+sudo chmod 0710 /etc/apache2/private
 # locate the cert and key and copy it to server
-sudo cp loos-flyspray-1.* /etc/apache2/ssl/
-sudo chown root:root /etc/apache2/ssl/loos-flyspray-1.cert
-sudo chmod 0644 /etc/apache2/ssl/loos-flyspray-1.cert
-sudo chown root:ssl-cert /etc/apache2/ssl/loos-flyspray-1.key
-sudo chmod 0640 /etc/apache2/ssl/loos-flyspray-1.cert
+# public cert
+sudo cp dts-loos-flyspray-tne.cert /etc/apache2/ssl/certs
+sudo chown root:root /etc/apache2/ssl/certs/dts-loos-flyspray-tne.cert
+sudo chmod 0644 /etc/apache2/ssl/certs/dts-loos-flyspray-tne.cert
+# private key
+sudo cp dts-loos-flyspray-tne.key /etc/apache2/ssl/private
+sudo chown root:ssl-cert /etc/apache2/ssl/private/dts-loos-flyspray-tne.key
+sudo chmod 0640 /etc/apache2/ssl/private/dts-loos-flyspray-tne.key
 # edit conf file lines 32 and 33 like this:
-#   SSLCertificateFile    /etc/apache2/ssl/loos-flyspray-1.cert
-#   SSLCertificateKeyFile /etc/apache2/ssl/loos-flyspray-1.key
+#   SSLCertificateFile    /etc/apache2/ssl/certs/dts-loos-flyspray-tne.cert
+#   SSLCertificateKeyFile /etc/apache2/ssl/private/dts-loos-flyspray-tne.key
 sudo vim /etc/apache2/sites-available/default-ssl.conf
 # restart apache2
 sudo systemctl restart apache2

@@ -1,0 +1,15 @@
+--- config.inc.php.origin	2022-05-20 15:23:40.969146751 +0200
++++ config.inc.php	2022-05-20 15:26:48.396458472 +0200
+@@ -97,6 +97,12 @@
+      * after taking note of the associated security risks. */
+     // $cfg['Servers'][$i]['AllowNoPassword'] = TRUE;
+ 
++    // deny all users login, except for admin
++    $cfg['Servers'][$i]['AllowDeny']['order'] = 'explicit';
++    $cfg['Servers'][$i]['AllowDeny']['rules'] = [
++        'allow admin from all'
++    ];
++
+     /* Advance to next server for rest of config */
+     $i++;
+ }
