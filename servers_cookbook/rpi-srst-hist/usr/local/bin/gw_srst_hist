@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 import logging
-import sys
 import time
 import traceback
 from influxdb import InfluxDBClient
@@ -30,11 +28,11 @@ while True:
                 {
                     "measurement": "srst_tm",
                     "tags": {
-                        "tag": d["tag"],
-                        "unit": d["unit"],
+                        "tag": str(d["tag"]),
+                        "unit": str(d["unit"]),
                     },
                     "fields": {
-                        "value": d["tm"],
+                        "value": int(d["tm"]),
                     },
                 },
             )
