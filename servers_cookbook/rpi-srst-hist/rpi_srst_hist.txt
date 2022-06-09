@@ -32,7 +32,7 @@ sudo systemctl start influxd
 # create DB
 influx -execute "CREATE DATABASE mydb"
 # fix default retention policy
-influx -execute "ALTER RETENTION POLICY autogen ON mydb DURATION 120d SHARD DURATION 1d DEFAULT"
+influx -execute "ALTER RETENTION POLICY autogen ON mydb DURATION 120d SHARD DURATION 7d DEFAULT"
 # check it
 influx -execute "SHOW RETENTION POLICIES ON mydb"
 
@@ -43,7 +43,19 @@ sudo vim /etc/influxdb/influxdb.conf
 sudo systemctl restart influxd
 
 # restore influx database (if replace an existing server)
-# TODO: add command here
+# on existing server
+influxd backup -portable -db mydb backup-dir
+# on new server, backup can’t be restored directly
+# so we restore a backup to a temporary database
+influxd restore -portable -db mydb -newdb mydb-tmp backup-dir/
+# query data from mydb-tmp and write it back to mydb
+# to avoid memory crash, we move large amounts of data with sequential queries
+# last 10 days copy
+influx -execute 'SELECT * INTO "mydb".autogen.:MEASUREMENT FROM "mydb-tmp".autogen./.*/ WHERE time > now() - 10d  GROUP BY *'
+# from 10 days to 20 days old
+influx -execute 'SELECT * INTO "mydb".autogen.:MEASUREMENT FROM "mydb-tmp".autogen./.*/ WHERE time < now() - 10d and time > now() - 20d GROUP BY *'
+# remove temporary database
+influx -execute 'DROP DATABASE mydb-tmp'
 
 ## Add data source scripts
 # install supervisor and python libs
