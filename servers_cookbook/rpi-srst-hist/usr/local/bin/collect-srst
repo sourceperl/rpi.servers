@@ -7,32 +7,30 @@ from influxdb import InfluxDBClient
 import requests
 
 # some const
-URL_EXP_TM = "http://163.111.168.11:8080/exp_mbus_tm.json"
+URL_EXP_TM = 'http://163.111.168.11:8080/exp_mbus_tm.json'
 
 # logging setup
-logging.basicConfig(format="%(asctime)s %(message)s")
+logging.basicConfig(format='%(asctime)s %(message)s')
 
 # connect to influxdb DB
-idb = InfluxDBClient(host="localhost", port=8086, 
-                     username="gw_srst_hist", password="gw_srst_hist")
-idb.switch_database("srst_historian")
+idb = InfluxDBClient(host='localhost', port=8086, database='mydb')
 
 while True:
     try:
         l_metrics = []
         # get data
-        r = requests.get(url=URL_EXP_TM)
+        r = requests.get(url=URL_EXP_TM, timeout=4.0)
         for d in r.json():
             # update metrics
             l_metrics.append(
                 {
-                    "measurement": "srst_tm",
-                    "tags": {
-                        "tag": str(d["tag"]),
-                        "unit": str(d["unit"]),
+                    'measurement': 'tag_historian',
+                    'tags': {
+                        'tag': str(d['tag']),
+                        'unit': str(d['unit']),
                     },
-                    "fields": {
-                        "value": int(d["tm"]),
+                    'fields': {
+                        'value': int(d['tm']),
                     },
                 },
             )

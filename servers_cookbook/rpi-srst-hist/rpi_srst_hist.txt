@@ -21,9 +21,6 @@ echo "deb https://repos.influxdata.com/debian $(lsb_release -cs) stable" | sudo 
 # update package index to include influxdata source
 sudo apt update
 
-# install influxdb and python libs
-sudo apt install influxdb python3-requests python3-influxdb
-
 # update influxdb default conf
 # setting reporting-disabled to true at beginning of the file to disable sending telemetry data
 # in [http] section, set http-bind-address to "127.0.0.1:8086" for bind to IPv4 localhost only
@@ -33,20 +30,11 @@ sudo vim /etc/infludb/influxdb.conf
 sudo systemctl start influxd
 
 # create DB
-influx -execute "CREATE DATABASE srst_historian"
+influx -execute "CREATE DATABASE mydb"
 # fix default retention policy
-influx -execute "ALTER RETENTION POLICY autogen ON srst_historian DURATION 120d SHARD DURATION 1d DEFAULT"
+influx -execute "ALTER RETENTION POLICY autogen ON mydb DURATION 120d SHARD DURATION 1d DEFAULT"
 # check it
-influx -execute "SHOW RETENTION POLICIES ON srst_historian"
-# credentials
-# admin user
-influx -execute "CREATE USER admin WITH PASSWORD 'admin' WITH ALL PRIVILEGES"
-# grafana user
-influx -execute "CREATE USER grafana WITH PASSWORD 'grafana'"
-influx -execute "GRANT READ ON srst_historian TO grafana"
-# data feeder script user
-influx -execute "CREATE USER gw_srst_hist WITH PASSWORD 'gw_srst_hist'"
-influx -execute "GRANT WRITE ON srst_historian TO gw_srst_hist"
+influx -execute "SHOW RETENTION POLICIES ON mydb"
 
 # turn on http auth on influxdb
 # edit "influxdb.conf" in [http] section update auth-enabled to true (near line 259)
@@ -57,12 +45,12 @@ sudo systemctl restart influxd
 # restore influx database (if replace an existing server)
 # TODO: add command here
 
-## Data feeder script
-# add supervisor package
-sudo apt install supervisor
-# copy script and activate it in supervisor
-sudo cp usr/local/bin/gw_srst_hist /usr/local/bin/
-sudo cp etc/supervisor/conf.d/gw_srst_hist.conf /etc/supervisor/conf.d/
+## Add data source scripts
+# install supervisor and python libs
+sudo apt install influxdb python3-requests python3-influxdb python3-psutil supervisor
+# copy data collect scripts and activate it in supervisor
+sudo cp usr/local/bin/* /usr/local/bin/
+sudo cp etc/supervisor/conf.d/* /etc/supervisor/conf.d/
 # wait network is setup at next pi reboot
 # sudo supervisorctl update
 
@@ -111,8 +99,7 @@ sudo ufw allow proto tcp from x.x.x.x/xx to any port 3000
 #   - customize admin password
 # add "influxdb" datasource
 #   - set URL as http://localhost:8086
-#   - set database as srst_historian
-#   - set auth as grafana/grafana
+#   - set database as mydb
 #   - take care to set min time interval to 40s (since we update every 30s)
 
 
