@@ -2,5 +2,5 @@
 # Regular cron jobs for the backup of this server to Loos NAS server
 #
 
-# boot and root fs to Loos NAS, run every 4h at h+10min
-10 */4 * * * root /usr/local/sbin/send_fs_to_nas >/dev/null 2>&1
+# boot and root fs to Loos NAS, run every day at 19h30
+30 19 * * * root /usr/local/sbin/send_fs_to_nas >/dev/null 2>&1
