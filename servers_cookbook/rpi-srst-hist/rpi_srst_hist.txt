@@ -8,8 +8,6 @@ update for Debian GNU/Linux 11 (bullseye) on aarch64 (get it with lsb_release -d
 sudo apt install ufw fail2ban
 sudo ufw enable
 
-# global packages
-sudo apt install
 
 ## InfluxDB part
 
@@ -18,13 +16,14 @@ curl -sL https://repos.influxdata.com/influxdb.key | gpg --dearmor \
   | sudo tee /etc/apt/trusted.gpg.d/influxdb.gpg  >/dev/null
 echo "deb https://repos.influxdata.com/debian $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/influxdb.list
 
-# update package index to include influxdata source
+# update package index to include influxdata source and install it
 sudo apt update
+sudo apt install influxdb 
 
 # update influxdb default conf
 # setting reporting-disabled to true at beginning of the file to disable sending telemetry data
 # in [http] section, set http-bind-address to "127.0.0.1:8086" for bind to IPv4 localhost only
-sudo vim /etc/infludb/influxdb.conf
+sudo vim /etc/influxdb/influxdb.conf
 
 # first run and initial setup
 sudo systemctl start influxd
@@ -59,7 +58,7 @@ influx -execute 'DROP DATABASE mydb-tmp'
 
 ## Add data source scripts
 # install supervisor and python libs
-sudo apt install influxdb python3-requests python3-influxdb python3-psutil supervisor
+sudo apt install python3-requests python3-influxdb python3-psutil supervisor
 # copy data collect scripts and activate it in supervisor
 sudo cp usr/local/bin/* /usr/local/bin/
 sudo cp etc/supervisor/conf.d/* /etc/supervisor/conf.d/
